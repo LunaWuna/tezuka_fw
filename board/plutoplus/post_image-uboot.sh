@@ -39,6 +39,15 @@ cp $BIN_DIR/system_top.bit $SDIMGDIR/
 cp $BIN_DIR/fsbl.elf $SDIMGDIR/
 echo "img : {[bootloader] $SDIMGDIR/fsbl.elf  $SDIMGDIR/system_top.bit  $SDIMGDIR/u-boot.elf}" >  $SDIMGDIR/boot.bif
 bootgen -image $SDIMGDIR/boot.bif -w -o i $SDIMGDIR/BOOT.bin
+mkdir -p $SDIMGDIR/overclock
+
+for filename in $BOARD_DIR/bitstream/overclock/*.elf ; do
+echo "img : {[bootloader] $filename  $SDIMGDIR/system_top.bit  $SDIMGDIR/u-boot.elf}" >  $SDIMGDIR/boot.bif    
+NAME=`basename -- "$filename" .elf`
+bootgen -image $SDIMGDIR/boot.bif -w -o i $SDIMGDIR"/overclock/BOOT_"$NAME
+done
+
+
 #rm $SDIMGDIR/fsbl.elf  $SDIMGDIR/system_top.bit  $SDIMGDIR/u-boot.elf $SDIMGDIR/boot.bif
 cp $BIN_DIR/rootfs.cpio.gz $SDIMGDIR/ramdisk.image.gz
 $mkimage -A arm -T ramdisk -C gzip -d $SDIMGDIR/ramdisk.image.gz $SDIMGDIR/uramdisk.image.gz
@@ -49,4 +58,4 @@ cp $BIN_DIR/plutoplus.dtb $SDIMGDIR/devicetree.dtb
 
 cp $BOARD_DIR/uboot-env.txt $SDIMGDIR/uEnv.txt
 
-cd $BIN_DIR && zip tezuka.zip boot.dfu boot.frm pluto.frm pluto.dfu sdimg/*
+cd $BIN_DIR && zip tezuka.zip boot.dfu boot.frm pluto.frm pluto.dfu sdimg/* sdimg/overclock/*
